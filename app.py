@@ -161,6 +161,11 @@ document.getElementById('error').style.display='none';
 document.getElementById('analyzeBtn').disabled=true;
 try{
 const res=await fetch('/predict',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url})});
+const contentType=res.headers.get('content-type')||'';
+if(!contentType.includes('application/json')){
+    const text=await res.text();
+    throw new Error('Server returned HTML instead of JSON. The request may have timed out. Try a different URL or try again.');
+}
 const data=await res.json();
 if(!res.ok)throw new Error(data.detail||'Analysis failed');
 render(data);
